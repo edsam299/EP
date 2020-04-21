@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Login form</title>
+<style type="text/css">
+.login { 
+height:100px;
+width:170px;
+margin:auto;
+margin-top:100px;
+border:1px #CCC solid;
+padding:10px;
+background-color:#E9E9E9 }
+
+input { 
+	background: #E1FFE1;
+	border:1px #CCC solid;
+	padding:5px;
+ }
+</style>
+</head>
+<body>
+<div>Version 27/06/2014</div>
+<form action="LoginService" method="post">
+<div id="divlogin" class="login">
+  <input type="text" placeholder="Username" id="user" name="user">  
+  <input type="password" placeholder="Password" id="pwd" name="pwd">  
+  <input type="submit" id="submit" value="Sign In">
+  <input type="hidden" id="app" name="app" value="EP">
+</div>
+</form>
+<script type="text/javascript">
+var QueryString = function ()
+{
+    var query_string = {};
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for(var i = 0; i < vars.length; i++)
+    {
+        var pair = vars[i].split("=");
+        // If first entry with this name
+        if(typeof query_string[pair[0]] === "undefined")
+        {
+            query_string[pair[0]] = pair[1];
+            // If second entry with this name
+        }
+        else if(typeof query_string[pair[0]] === "string")
+        {
+            var arr = [query_string[pair[0]], pair[1]];
+            query_string[pair[0]] = arr;
+            // If third or later entry with this name
+        }
+        else
+        {
+            query_string[pair[0]].push(pair[1]);
+        }
+    }
+    return query_string;
+}();
+
+if(QueryString.app=='ITAP'){
+	document.getElementById('user').value=(QueryString.user=='undefined')?000:QueryString.user;
+	document.getElementById('submit').click();
+	document.getElementById('divlogin').style.display='none';
+	document.getElementById('app').value=QueryString.app;
+}
+</script>
+</body>
+</html>

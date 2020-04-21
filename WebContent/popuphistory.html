@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>View History</title>
+<link rel="stylesheet" type="text/css" href="dhtmlxGrid/codebase/dhtmlxgrid.css">
+<link rel="stylesheet" type="text/css" href="dhtmlxGrid/codebase/skins/dhtmlxgrid_dhx_skyblue.css">
+<link rel="stylesheet" type="text/css" href="dhtmlxmsg/codebase/themes/message_default.css">
+<link rel="stylesheet" type="text/css" href="css/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="css/jquery.loadmask.css"/>
+<link rel="stylesheet" type="text/css" href="css/basic.css"/>
+
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery.loadmask.min.js"></script>
+<script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="dhtmlxmsg/codebase/message.js"></script> 
+<script  src="dhtmlxGrid/codebase/dhtmlxcommon.js"></script>
+<script  src="dhtmlxGrid/codebase/dhtmlxgrid.js"></script>
+<script  src="dhtmlxGrid/codebase/dhtmlxgridcell.js"></script>
+<script type="text/javascript" src="js/common.js"></script> 
+</head>
+<body>
+	<div align="center"><div id="ghistory" style="width:900px;height:600px;background-color:white;"></div></div>
+</body>
+<script type="text/javascript">
+$(document).ready(function(){
+	var obj=window.dialogArguments;
+	document.title=obj.title;
+	var ukitUtil = new UkitUtil();
+	var ghistory=ukitUtil.createDhtmlxGrid('ghistory');
+	ghistory.setImagePath("dhtmlxGrid/codebase/imgs/");
+	ghistory.setHeader("Date,Detail,UserName,Page,idh");
+	ghistory.setColumnIds("date,detail,username,page");
+	ghistory.setInitWidths("150,500,120,120");
+	ghistory.setColAlign("left,left,left,left");
+	ghistory.setColTypes("ro,ro,ro,ro");
+	ghistory.setSkin('modern');
+	ghistory.enableMultiline(true);
+	ghistory.setStyle("", "font: 16px Open Sans","", "");
+	ghistory.init();
+	for(var i=0; len=obj.history.length, i<len; i++){
+		ghistory.addRow(i, [obj.history[i].date, obj.history[i].ft,obj.history[i].username, obj.history[i].page], i);
+	}
+	obj=null; ukitUtil=null;
+});	
+</script>
+</html>

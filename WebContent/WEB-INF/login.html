@@ -1,0 +1,88 @@
+<html>
+
+<head>
+	
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	
+	<title>Login to Editing Program</title>
+
+	<!-- CSS -->
+	<style>
+		@font-face {
+			font-family: CAPUT_TRIAL;
+			src: url(./app_login/font/CAPUT_TRIAL.otf);
+		}
+	</style>
+	<link rel="stylesheet" type="text/css"  href="./app_login/css/reset.css">
+	<link rel="stylesheet" type="text/css"  href="./app_login/css/animate.css">
+	<link rel="stylesheet" type="text/css"  href="./app_login/css/styles.css">
+	
+</head>
+<body>
+	<div style="background-color:white;">
+	<table width=100% >
+		<tr>
+			<td width=8% align="center"><img src="./app_login/img/logo.jpg" width="80px" height="80px"></td>
+			<td style=" text-align:center; vertical-align:middle;font-family:CAPUT_TRIAL;font-face:CAPUT_TRIAL;color:gray;
+			font-size:50px">
+			<h1><b>
+			
+			Editing Program&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></h1>
+			</td>
+		</tr>
+	</table>
+	
+	
+	
+	</div>
+	<!-- Begin Page Content -->
+	
+	<div id="container" style="font-size:20px;">
+	
+		<form action="LoginService" method="post">
+		
+		<label for="name">Username:</label>
+		
+		<input type="name" id="user" name="user">
+		
+		<label for="username">Password:</label>
+				
+		<input type="password" id="pwd" name="pwd">
+		
+		<div id="lower">
+		
+	
+		<input type="submit" value="Login" id="submit" onclick="login();">
+		
+		</div>
+		<input type="hidden" id="app" name="app" value="EP">
+		</form>
+		
+	</div>
+	
+	
+	<!-- End Page Content -->
+	
+</body>
+<script>
+document.getElementById('user').focus();
+var browser=JSON.stringify({
+	  isChrome: /Google Inc/.test(navigator.vendor),
+	}, null, '  ');
+	browser=eval(' ( '+browser+' ) ');
+	if(browser.isChrome==false){
+		alert('Browser is support for chrome only');
+		var win = window.open("about:blank", "_self");
+		win.close();
+	}
+</script>
+
+</html>
+	
+	
+	
+	
+	
+		
+	

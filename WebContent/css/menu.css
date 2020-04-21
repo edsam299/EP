@@ -1,0 +1,19 @@
+/* CSSTerm.com CSS Horizontal menu text only */
+.navigation ul,.navigation li {
+list-style-type:none;
+display:inline;
+margin:0px 10px;
+}
+
+.navigation a:link, .navigation a:visited, .navigation a:active {
+font-size:22px;
+color:#5D7393;
+border-bottom:3px #5D7393 solid;
+padding:5px 5px 5px 5px;
+text-decoration: none;
+}
+
+.navigation a:hover {
+border-bottom:5px solid #F9F044;
+color:#000;
+}

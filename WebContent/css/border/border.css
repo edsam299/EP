@@ -1,0 +1,24 @@
+.border-line{
+	border:solid 1px green
+}
+
+.fixbutton{
+	margin-left:2px;
+	margin-right:2px;
+}
+
+.left {
+    float: left;
+    width: auto;
+/*     background-color: #b0e0e6; */
+}
+.right {
+    float: right;
+    width: auto;
+/*     background-color: #b0e0e6; */
+}
+.left {
+    float: left;
+    width: auto;
+/*     background-color: #b0e0e6; */
+}

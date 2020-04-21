@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+</head>
+<body>
+<div id="word" contenteditable="true" spellcheck="false" onclick="reply_click(this.value);">
+<style scoped>
+  #word { margin-bottom: 10px; }
+  [contenteditable="true"] { padding: 10px; outline: 2px dashed #CCC; }
+  [contenteditable="true"]:hover { outline: 2px dashed #0090D2; }
+</style>
+<label id='1136'>evamme ^</label>&nbsp;<label id='3'>sutaṃ</label>&nbsp;<label id='4'>ekaṃ</label>&nbsp;<label id='5'>samayaṃ</label>&nbsp;<label id='1099'>bhagavā sāvatthiyaṃ viharati jetavane</label><br/><label id='10'>anāthapiṇḍikassa</label>&nbsp;<label id='11'>^</label>&nbsp;<label id='12'>kareri-kuṭikāyaṃ</label>&nbsp;<label id='1100'>athakh</label>&nbsp;<label id='15'>sambahūlānaṃ</label><br/><label id='16'>bhikkhūnaṃ</label>&nbsp;<label id='17'>pacchā-bhattaṃ</label>&nbsp;<label id='18'>piṇḍapātapaṭikkantāṇaṃ</label>&nbsp;<label id='19'>karerimaṇḍalamāle</label>&nbsp;<label id='20'>sannisiṇṇānaṃ</label><br/><label id='21'>sannipatitānaṃ</label>&nbsp;<label id='22'>pubbe-nivāsa-paṭisaṃyuttā</label>&nbsp;<label id='23'>dhammī</label>&nbsp;<label id='24'>kathā</label>&nbsp;<label id='25'>udapādi</label>&nbsp;<label id='26'>iti</label>&nbsp;<label id='27'>pubbe-nivāso</label><br/><label id='28'>iti</label>&nbsp;<label id='29'>pubbenivāso</label>&nbsp;<label id='30'>^</label>
+</div>
+<div id="display"></div>
+
+<table>
+<tr><td><div contenteditable style="background-color: blue;">I'm editable</div></td><td><div contenteditable>I'm also editable</div></td></tr>
+<tr><td>I'm not editable</td></tr>
+</table>
+</body>
+<script type="text/javascript">
+function reply_click(e) {
+	e = e || window.event;
+	e = e.target || e.srcElement;	
+// 	alert(e.nodeName);
+	if (e.nodeName === 'LABEL' || e.nodeName === 'I') {
+//		console.log(window.frames["comments"]);
+//		console.log(document.getElementById('comments.document'));
+		if(document.getElementById(e.id).parentNode.id!='word')
+			_idword=document.getElementById(e.id).parentNode.id;
+		else
+			_idword=e.id;
+		document.getElementById('display').innerHTML=_idword;
+		
+	}
+}
+</script>
+</html>
