@@ -9,7 +9,7 @@
 <title>Linking</title>
 </head>
 <body>
-<iframe id="lp" style="width:100%; height:1000%" scrolling="yes"></iframe>
+<iframe id="lp" style="width:100%; height:700px" scrolling="yes"></iframe>
 <!-- 	<div id="content"> -->
 <!-- 		<div class="easyui-layout" style="width:97vw;height:92vh;"> -->
 <%-- 			<div region="west" split="true" title="<b>Choose a Text</b>" style="width:200px;"> --%>
@@ -25,7 +25,7 @@
 	var baseUrl = "${pageContext.request.contextPath}";
 	var _iduser='${sessionScope.iduser}';
 	var role='${sessionScope.idrole}';
-	document.getElementById("lp").src="http://localhost:8080/LP/index.jsp?iduser="+_iduser;
+	document.getElementById("lp").src="http://10.190.0.57:8080/LP/index.jsp?iduser="+_iduser;
 // 	loadButton(role, 17);
 </script>
 <%-- <script src="js/linking_new.js?${sessionScope.key}"></script> --%>
