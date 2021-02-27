@@ -222,7 +222,7 @@ document.getElementById('b_search').addEventListener('click', function(){
 				else
 					typeSearch='LIKE';
 				CESearchService.searchKeyword(document.getElementById('t_search').value, typeSearch, function(data){
-//					console.log(data);	
+					console.log(data);	
 //					for(var i=0; i<data.hits.hits.length; i++){
 //						 console.log(decodeURIComponent(data.hits.hits[i]._source.footnote));
 //					}
@@ -296,7 +296,7 @@ document.getElementById('b_search').addEventListener('click', function(){
 });
 
 function CESearch(){
-	
+	var sizelimit=150;
 	CESearch.prototype.ElasticSearch = function(command, db, event, method, fn){
 		$.ajax({
 			  method: method,
@@ -314,7 +314,9 @@ function CESearch(){
 			});
 	};
 	CESearch.prototype.loadData = function(fn){
+		
 		var query_basetextcontent={
+				"size":sizelimit,
 			    "query": {
 			        "query_string" : {
 			            "fields" : ["description", "status"],
@@ -348,6 +350,7 @@ function CESearch(){
 		if(_basetext_content.length>0){
 			des=''; count_loop=0;
 			var query_basetextcontent_detail={
+					"size":sizelimit,
 				    "query": {
 				        "query_string" : {
 				            "fields" : ["idbasetextcontent"],
@@ -364,6 +367,7 @@ function CESearch(){
 				}
 			}
 			query_basetextcontent_detail=JSON.stringify(query_basetextcontent_detail).split('{desc}').join(des);
+		
 			this.ElasticSearch(query_basetextcontent_detail, 'basetext_content_detail', '_search', 'POST', function(data){				
 				_basetext_content_detail=new Array();
 				for(var i=0; i<data.hits.hits.length; i++){
@@ -383,6 +387,7 @@ function CESearch(){
 //				console.log(arrChkColor);
 				
 				var query_basetext_level={
+						"size":sizelimit,
 					    "query": {
 					        "query_string" : {
 					            "fields" : ["id"],
@@ -415,6 +420,7 @@ function CESearch(){
 		if(_basetext_content_detail.length>0){
 			des=''; count_loop=0;
 			var query_basetext_level_detail={
+					"size":sizelimit,
 				    "query": {
 				        "query_string" : {
 				            "fields" : ["textCode"],
@@ -422,6 +428,7 @@ function CESearch(){
 				        }
 				    }
 				};
+		
 			for(var i=0; i<_basetext_content_detail.length; i++){
 				if(count_loop==0){
 					des=_basetext_content_detail[i].textcode.substring(1,2);
@@ -462,10 +469,11 @@ function CESearch(){
 		var query_by_keywowrd={    "query": {
 	        "query_string" : {
 	            "fields" : ["content", "textcode","basetext_content_detail","comment_content","comment_conclusion","comment_reason"],
-	            "query" : "content:{keyword} AND (textcode:{desc}) AND " +
-	            (document.getElementById('chktypesearch_conclusion').checked?"(comment_conclusion:*?*)":"(footnote:*?* OR comment_conclusion:*?* OR comment_content:*?* OR comment_reason:*?*)")
+	            "query" : "(content:{keyword} AND (textcode:{desc})) OR( " +
+	            (document.getElementById('chktypesearch_conclusion').checked?"(comment_conclusion:*?*)":"(footnote:*?* OR comment_conclusion:*?* OR comment_content:*?* OR comment_reason:*?*))")
 	        }
 	    },
+		"track_total_hits": true,
 	    "size":100000,
 	    "aggs": {
 	    "group_by_state": {
@@ -512,13 +520,15 @@ function CESearch(){
 	};
 	
 	CESearch.prototype.searchAllBasetextCategory = function(fn){
-		var query={"query": {
-	        "query_string" : {
-	            "fields" : ["description", "seq", "status"],
-	            "query" : "status:1"
-	        }
-	    	},"sort": [{"seq": {"order": "desc"}}],
-				  "size": 100
+		var query={
+			"size":sizelimit,
+			"query": {
+		        "query_string" : {
+		            "fields" : ["description", "seq", "status"],
+		            "query" : "status:1"
+		        }
+	    	},"sort": [{"seq": {"order": "desc"}}]
+				  
 			};
 		
 		this.ElasticSearch(JSON.stringify(query), 'basetext_category', '_search', 'POST', function(data){

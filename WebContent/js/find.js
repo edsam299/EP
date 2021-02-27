@@ -1,3 +1,6 @@
+function test(){
+
+}
 function findWord(word,divname){	
 	word=word.trim();
 	$('#'+divname).removeHighlight();	

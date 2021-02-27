@@ -146,7 +146,6 @@ setTimeout(function(){
 		var comment_=document.getElementsByClassName('note-editable panel-body');		
 		var conclusion_=(document.getElementById('chkconclusion').checked?1:0);
 		var txt=comment_[0].innerText.trim();
-		console.log(comment_);
 		if(txt.length==0 || localStorage.getItem('idword')==null)
 			return;
 		if(editflag){
