@@ -212,107 +212,94 @@ document.getElementById('b_search').addEventListener('click', function(){
 			}
 		});
 	}else{
+		
 		CESearchService.loadData(function(complete){
 			if(complete){
 				var typeSearch=null;
-				var arr_word= [];
-				typeSearch = (document.getElementById('chktypesearch_exact').checked?'EXACT':'LIKE');
+				var arr_word= new Array();
+				if(document.getElementById('chktypesearch_exact').checked)
+					typeSearch='EXACT';
+				else
+					typeSearch='LIKE';
+					
+				console.log('searchKeyword '+ typeSearch +'typeSearch')
 				CESearchService.searchKeyword(document.getElementById('t_search').value, typeSearch, function(data){
 					console.log(data);	
+//					for(var i=0; i<data.hits.hits.length; i++){
+//						 console.log(decodeURIComponent(data.hits.hits[i]._source.footnote));
+//					}
 					var sort_pali=0;  var obj_word = null;
-				    for(var i=0; i<data.aggregations.group_by_state.buckets.length; i++){
-				    	sort_pali="";
-				    	obj_word={};
-				    	obj_word.word=data.aggregations.group_by_state.buckets[i].key;
-				    	obj_word.word_count=data.aggregations.group_by_state.buckets[i].doc_count;
-				    	obj_word.sort_pali=null;
-				    	for(var j=0; j<data.aggregations.group_by_state.buckets[i].key.length; j++){
-				    		sort_pali+=map.get(data.aggregations.group_by_state.buckets[i].key[j]);				    			   
-				    	}	
-				    	obj_word.sort_pali=sort_pali;
-				    	arr_word.push(obj_word);				    	   
-					}
-				    arr_word.sort(function(a, b) {
-				    	return a.sort_pali.localeCompare(b.sort_pali);   
-				    });
-					if(arr_word.length>0){
-						var obj={};
-						obj.arr_word=arr_word;arr_word=[];
-						obj.keyword=document.getElementById('t_search').value;
-						word_allByTextCode=obj;
-						CESearchService.searchBasetext_category(document.getElementById('t_search').value, function(databasetextcat){
-							console.log(databasetextcat);
-							if(databasetextcat.aggregations.group_by_state.buckets.length>0){
-								obj.basetext_category=[]; 
-								var basetext_category=null;
-								for(var i=0; i<databasetextcat.aggregations.group_by_state.buckets.length; i++){
-									basetext_category={};
-						    		basetext_category.key=databasetextcat.aggregations.group_by_state.buckets[i].key;
-						    		basetext_category.doc_count=databasetextcat.aggregations.group_by_state.buckets[i].doc_count;
-						    		for(var k=0; k<_basetext_category_master.length; k++){
-								    	if(basetext_category.key==_basetext_category_master[k].description){
-								    		basetext_category.seq=_basetext_category_master[k].seq;
-								    		break;
-								    	}						    			  
-						   			}
-						    		obj.basetext_category.push(basetext_category);
-									basetext_category=null;
-								}
-								obj.basetext_category.sort(function(a, b) {
-									return a.seq>b.seq;   
+				       for(var i=0; i<data.aggregations.group_by_state.buckets.length; i++){
+				    	   sort_pali="";
+				    	   obj_word=new Object();
+				    	   obj_word.word=data.aggregations.group_by_state.buckets[i].key;
+				    	   obj_word.word_count=data.aggregations.group_by_state.buckets[i].doc_count;
+				    	   obj_word.sort_pali=null;//new Array();
+				    	   for(var j=0; j<data.aggregations.group_by_state.buckets[i].key.length; j++){
+				    		   sort_pali+=map.get(data.aggregations.group_by_state.buckets[i].key[j]);				    			   
+				    	   }	
+				    	   obj_word.sort_pali=sort_pali;
+				    	   arr_word.push(obj_word);				    	   
+					   }
+				       arr_word.sort(function(a, b) {
+				    	   return a.sort_pali.localeCompare(b.sort_pali);   
+				       });
+//				       item1.attr.localeCompare(item2.attr);
+//				       console.log(arr_word);
+				});
+				console.log('arr_word.length '+arr_word.length)
+				if(arr_word.length>0){
+					var obj=new Object();
+					obj.arr_word=arr_word;
+					obj.keyword=document.getElementById('t_search').value;
+					word_allByTextCode=obj;
+					console.log('searchBasetext_category ')
+					CESearchService.searchBasetext_category(document.getElementById('t_search').value, function(data){
+						console.log(data);
+						console.log('response searchBasetext_category '+data.aggregations.group_by_state.buckets.length)
+						if(data.aggregations.group_by_state.buckets.length>0){
+							obj.basetext_category=new Array(); 
+							var basetext_category=null;
+						       for(var i=0; i<data.aggregations.group_by_state.buckets.length; i++){
+						    	   basetext_category=new Object();
+						    	   basetext_category.key=data.aggregations.group_by_state.buckets[i].key;
+						    	   basetext_category.doc_count=data.aggregations.group_by_state.buckets[i].doc_count;
+						    	   for(var k=0; k<_basetext_category_master.length; k++){
+						    		   if(basetext_category.key==_basetext_category_master[k].description){
+						    			   basetext_category.seq=_basetext_category_master[k].seq;
+						    			   break;
+						    		   }						    			  
+						    	   }
+						    	   obj.basetext_category.push(basetext_category);
+						       }
+//						       console.log(obj);
+						       obj.basetext_category.sort(function(a, b) {
+						    	   return a.seq>b.seq;   
+						       });
+//								_ukitUtil.closePopup('viewpali');
+//								_ukitUtil.popuup(screen.width, screen.height, 0, 0, 'yes', 'viewpali_cesearch.jsp',obj,'viewpali');
+						       if(arr_word.length>1){ //กรณีมีหลายคำให้ Popup เลือกคำ
+							       CESearchService.viewPali(obj, function(){
+							    	   
+							       });
+						       }else{ //กรณีมีคำเดียวไม่ต้อง Popup
+						    	   getWord(arr_word[0].word,'MAIN_SEARCH');
+						       }
+								CESearchService.searchAllBasetextCategory(function(data){
+//									console.log(data);
 								});
-								//กรณีมีหลายคำให้ Popup เลือกคำ
-								if(obj.arr_word.length>1){ 
-									CESearchService.viewPali(obj, function(){
-										CESearchService.searchAllBasetextCategory(function(data){
-//											console.log(data);
-										}); 
-									});
-								 }else{ //กรณีมีคำเดียวไม่ต้อง Popup
-								    getWord(obj.arr_word[0].word,'MAIN_SEARCH');
-									CESearchService.searchAllBasetextCategory(function(data){
-//											console.log(data);
-									});
-								 }
-							}
-						});
-					}else{
-						dhtmlxs.alert("<img src='dhtmlxmsg/codebase/alert_small.png'>Search <b>"+document.getElementById('t_search').value+'</b> not found');
-					}
-				});		
+								
+						}
+					});
+				}else{
+					dhtmlxs.alert("<img src='dhtmlxmsg/codebase/alert_small.png'>Search <b>"+document.getElementById('t_search').value+'</b> not found');
+				}
+				
 			}
 		});
 	}
 });
-function getTextCodeDetail(pid){
-	console.log('pid '+pid)
-	var ptsearch=document.getElementById('t_search').value;
-	CESearchService.searchTextCode(ptsearch, pid, function(data){
-		console.log(data);
-		console.log(data.aggregations.group_by_state.buckets.length)
-		var arr_word=[];
-		for(var i=0; i<data.aggregations.group_by_state.buckets.length; i++){
-			sort_pali="";
-			obj_word={};
-			obj_word.word=data.aggregations.group_by_state.buckets[i].key;
-			obj_word.word_count=data.aggregations.group_by_state.buckets[i].doc_count;
-			obj_word.sort_pali=null;//new Array();
-			for(var j=0; j<data.aggregations.group_by_state.buckets[i].key.length; j++){
-				sort_pali+=map.get(data.aggregations.group_by_state.buckets[i].key[j]);				    			   
-			}	
-			obj_word.sort_pali=sort_pali;
-			arr_word.push(obj_word);				    	   
-		}
-		console.log('arr_word ');
-		arr_word.sort(function(a, b) {
-			return a.sort_pali.localeCompare(b.sort_pali);   
-		});
-		console.log(arr_word)
-		let obj={};
-		obj.arr_word=arr_word;
-		setContentDetail(obj,'ByTextCode');			
-	});		
-}
+
 function CESearch(){
 	var sizelimit=150;
 	CESearch.prototype.ElasticSearch = function(command, db, event, method, fn){
@@ -320,6 +307,7 @@ function CESearch(){
 			  method: method,
 			  url: _server+"/"+db+"/"+event,
 			  async: false,
+			crossdomain:true,
 			  data:command,
 			  dataType : 'json',
 			  contentType: 'application/json'
@@ -491,13 +479,13 @@ function CESearch(){
 	            (document.getElementById('chktypesearch_conclusion').checked?"(comment_conclusion:*?*)":"(footnote:*?* OR comment_conclusion:*?* OR comment_content:*?* OR comment_reason:*?*))")
 	        }
 	    },
-		"track_total_hits": true,
+//		"track_total_hits": true,
 	    "size":100000,
 	    "aggs": {
 	    "group_by_state": {
 	      "terms": {
 	        "field": "content",
-	        "size": 1000000
+	        "size": 10000
 	      }
 	    }
 	    
@@ -529,7 +517,6 @@ function CESearch(){
 		    "size":100000,
 		    "aggs":{"group_by_state":{"terms":{"field":"content","size":1000000}}},"sort":[{"textcode":{"order":"asc"}},{"lineno":{"order":"asc"}},{"fnseq":{"order":"asc"}}]};
 		query_by_textcode=JSON.stringify(query_by_textcode).split('{desc}').join(textcode).split('{keyword}').join('*'+keyword+'*');
-//		console.log(query_by_textcode);
 		this.ElasticSearch(query_by_textcode, _dbep, '_search', 'POST', function(data){				
 			_basetext_level_detail=new Array();
 //			console.log(data);
@@ -563,14 +550,15 @@ function CESearch(){
 			            (document.getElementById('chktypesearch_conclusion').checked?"(comment_conclusion:*?*)":"(footnote:*?* OR comment_conclusion:*?* OR comment_content:*?* OR comment_reason:*?*)")
 			        }
 			    },
-			   "aggs": {
+			    "size":100000,
+			    "aggs": {
 			    "group_by_state": {
 			      "terms": {
 			        "field": "basetext_category.keyword",
 			        "size": 1000000
 			      }
 			    }
-			  }, "size":100000
+			  }
 			};
 		
 		var count_loop=0; var des='';
@@ -586,29 +574,41 @@ function CESearch(){
 		query_basetext_category=JSON.stringify(query_basetext_category).split('{desc}').join(des).split('{keyword}').join('*'+keyword+'*');
 		console.log(query_basetext_category);
 		this.ElasticSearch(query_basetext_category, _dbep, '_search', 'POST', function(data){	
-//			console.log(data);
+			console.log(data);
 			fn(data);
 		});
 	};
 
 	CESearch.prototype.viewPali = function(data, fn){
-		console.log('viewparli');
-		var event0="onclick=getTextCodeDetail('{id}')"
-		var event1='';
-		var startTime =  (new Date()).getTime();
-		var tdiv_header='Search: <b>'+data.keyword+'</b>&nbsp;';
-		var startTime =  (new Date()).getTime();
-		console.log(data.basetext_category.length);
+		var html='<div class="container">';
+		html+='<button type="button" style="display:none" id="getView" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" data-backdrop="static" data-keyboard="false"></button>';
+		html+='<div class="modal fade" id="myModal" role="dialog">';
+		html+='<div class="modal-dialog" style="width:90%;">';
+		html+='<div class="modal-content">';
+		html+='<div class="modal-header">';
+		html+='<button type="button" id="close_popup" class="close" data-dismiss="modal">&times;</button>';
+		html+='<h4 class="modal-title"><div id="div_header"></div></h4></div>';
+		html+='<div class="modal-body"><div id="divview" style="height:400px; overflow-y: scroll;">{table}</div></div>';
+		html+='<div class="modal-footer">';
+//		html+='<input type="button" class="btn btn-primary" id="savecty" value="Save">';
+//		html+='<button type="button" class="close" id="close" data-dismiss="modal" style="display:none">Close</button>';
+		html+='</div></div></div></div></div>';
+		var table='<table class="table table-condensed table table-bordered">';
+		table+='<tr><td width="50%"><div id="col1"></div></td><td width="50%"><div id="col2"></div></td></tr></table>';
+		document.getElementById('viewpopup').innerHTML=html;
+		document.getElementById('viewpopup').style.display='';	 
+
+		document.getElementById('divview').innerHTML=document.getElementById('divview').innerHTML.split('{table}').join(table);
+		document.getElementById('div_header').innerHTML='Search: <b>'+data.keyword+'</b>&nbsp;';
+//		console.log(data);
 		if(data.basetext_category.length>0){
 			var sort=false;
-			tdiv_header+='<button type="button" class="btn btn-warning" id="getAllTextCode">All</button>';
+			document.getElementById('div_header').innerHTML+='<button type="button" class="btn btn-warning" id="getAllTextCode">All</button>';
 			for(var i=0; i<data.basetext_category.length; i++){
 				if(i==0){ //first loop
-					event1 = event0.split("{id}").join(data.basetext_category[i].key);
-					tdiv_header+='<button  type="button" '+event1+'  class="btn btn-warning" id="{id}">{key}</button>'
+					document.getElementById('div_header').innerHTML+='<button type="button" class="btn btn-warning" id="{id}">{key}</button>'
 						.split('{key}').join(data.basetext_category[i].key+':'+data.basetext_category[i].doc_count)
 						.split('{id}').join(data.basetext_category[i].key);	
-						console.log(data.basetext_category[i].key)
 				}else{
 					for(var k=0; k<_basetext_category_master.length; k++){
 						if(data.basetext_category[i].key==_basetext_category_master[k].description){
@@ -616,7 +616,7 @@ function CESearch(){
 								if(_piseq[seq].flag==0){
 									if(_piseq[seq].seq-_basetext_category_master[k].seq<0){
 										_piseq[seq].flag=1;
-										tdiv_header+='<button type="button"  class="btn btn-warning" id="{id}">{key}</button>'
+										document.getElementById('div_header').innerHTML+='<button type="button" class="btn btn-warning" id="{id}">{key}</button>'
 											.split('{key}').join('|').split('{id}').join(0);	
 										sort=true;
 										break;
@@ -628,42 +628,46 @@ function CESearch(){
 							break;
 						}			
 					}
-					event1 = event0.split("{id}").join(data.basetext_category[i].key);
-					tdiv_header+='<button type="button" '+event1+' class="btn btn-warning" id="{id}">{key}</button>'
+//					if(sort==false){
+						document.getElementById('div_header').innerHTML+='<button type="button" class="btn btn-warning" id="{id}">{key}</button>'
 							.split('{key}').join(data.basetext_category[i].key+':'+data.basetext_category[i].doc_count)
 							.split('{id}').join(data.basetext_category[i].key);	
-				}
+//					}
+				}	
 			}
-			
+			console.log('data.basetext_category.length xx '+data.basetext_category.length)
+			for(var i=0; i<data.basetext_category.length; i++){ //Make Event Search By Textcode
+				document.getElementById(data.basetext_category[i].key).addEventListener('click', function(){
+					CESearchService.searchTextCode(document.getElementById('t_search').value, this.id, function(data){
+//						console.log(data);
+						var arr_word=new Array();
+					       for(var i=0; i<data.aggregations.group_by_state.buckets.length; i++){
+					    	   sort_pali="";
+					    	   obj_word=new Object();
+					    	   obj_word.word=data.aggregations.group_by_state.buckets[i].key;
+					    	   obj_word.word_count=data.aggregations.group_by_state.buckets[i].doc_count;
+					    	   obj_word.sort_pali=null;//new Array();
+					    	   for(var j=0; j<data.aggregations.group_by_state.buckets[i].key.length; j++){
+					    		   sort_pali+=map.get(data.aggregations.group_by_state.buckets[i].key[j]);				    			   
+					    	   }	
+					    	   obj_word.sort_pali=sort_pali;
+					    	   arr_word.push(obj_word);				    	   
+						   }
+					       arr_word.sort(function(a, b) {
+					    	   return a.sort_pali.localeCompare(b.sort_pali);   
+					       });
+							var obj=new Object();
+							obj.arr_word=arr_word;
+						setContentDetail(obj,'ByTextCode');
+					});		
+				});
+			}
+			document.getElementById('getAllTextCode').addEventListener('click', function(){
+				setContentDetail(word_allByTextCode,'All');
+			});
+			setContentDetail(data,'load');
 		}
-		console.log(tdiv_header);
-		var html='<div class="container">';
-		html+='<button type="button" style="display:none" id="getView" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" data-backdrop="static" data-keyboard="false"></button>';
-		html+='<div class="modal fade" id="myModal" role="dialog">';
-		html+='<div class="modal-dialog" style="width:90%;">';
-		html+='<div class="modal-content">';
-		html+='<div class="modal-header">';
-		html+='<button type="button" id="close_popup" class="close" data-dismiss="modal">&times;</button>';
-		html+='<h4 class="modal-title"><div id="div_header"></div></h4></div>';
-		html+='<div class="modal-body"><div id="divview" style="height:400px; overflow-y: scroll;">{table}</div></div>';
-		html+='<div class="modal-footer">';
-		html+='</div></div></div></div></div>';
-		var table='<table class="table table-condensed table table-bordered">';
-		table+='<tr><td width="50%"><div id="col1"></div></td><td width="50%"><div id="col2"></div></td></tr></table>';
-		document.getElementById('viewpopup').innerHTML=html;
-		document.getElementById('viewpopup').style.display='';	 
-		document.getElementById('divview').innerHTML=document.getElementById('divview').innerHTML.split('{table}').join(table);
-		document.getElementById('div_header').innerHTML=tdiv_header; tdiv_header='';
-		console.log('set html');
-		document.getElementById('getAllTextCode').addEventListener('click', function(){
-			setContentDetail(word_allByTextCode,'All');
-		});
-		console.log('set event cont html');
-		setContentDetail(data,'load');
-		data=null;
 		
-		var endTime = (new Date()).getTime();
-		console.log((endTime-startTime) / 1000);
 	};
 
 	CESearch.prototype.searchUnit = function(textcode, unit, fn){
@@ -885,6 +889,8 @@ function CESearch(){
 		var close_table='</tbody></table></div></div>';
 		_basetext_level_detail=new Array();
 //		console.log(basetext_level_detail);
+		console.log('basetext_level_detail.hits.hits.length '+basetext_level_detail.hits.hits.length);
+		let start = new Date();
 		for(var i=0; i<basetext_level_detail.hits.hits.length; i++){
 			 tr_td='<tr><td style="width:3%" valign="top">{col1}</td><td style="width:3%" valign="top">{col2}</td><td style="width:5%" valign="top">{col3}</td><td style="width:20%" valign="top">{col4}</td><td style="width:15%" valign="top">{col7}</td><td style="width:10%" valign="top">{col8}</td><td style="width:35%" valign="top">{col5}</td><td style="width:10%" valign="top">{col9}</td><td style="width:10%" valign="top">{col10}</td><td style="width:5%" valign="top">{col6}</td></tr>';
 			 tr_td=tr_td.split('{col1}').join(basetext_level_detail.hits.hits[i]._source.textcode);
@@ -922,10 +928,15 @@ function CESearch(){
 //			 console.log(i);
 //			 console.log(decodeURIComponent(basetext_level_detail.hits.hits[i]._source.footnote));
 //			 console.log(b64_to_utf8(basetext_level_detail.hits.hits[i]._source.comment_content));
-		}
+		}		
 //		console.log(table+item+close_table);
 		document.getElementById('display_detail').innerHTML=table+item+close_table;
 		document.getElementById('display_detail').style.height='400px';
+		let end=new Date();		
+		let time = Math.abs(end - start) / 1000;
+		let minutes = Math.floor(time / 60) % 60;
+		let sec = time % 60;
+		console.log('success render basetext_level_detail '+ minutes+':'+sec)
 		fn(true);
 	};
 	
@@ -1544,28 +1555,34 @@ function eventAllCheckBox(event){
 	}
 }
 function setContentDetail(data, type){
-	console.log('setContentDetail '+type);
-	var tcol1='';var tcol2=''; var prow=15;
+	console.log('setContentDetail '+data.arr_word.length+' '+type);
 	document.getElementById('col1').innerHTML='';
 	document.getElementById('col2').innerHTML='';
-	if(data.arr_word.length<prow){
+	if(data.arr_word.length<15){
 		for(var i=0; i<data.arr_word.length; i++){
-			tcol1+='<p onclick="getWord('+"'"+data.arr_word[i].word+"'"+","+"'POPUP'"+')">'+data.arr_word[i].word+' ('+data.arr_word[i].word_count+')</p>';
+			document.getElementById('col1').innerHTML+='<p onclick="getWord('+"'"+data.arr_word[i].word+"'"+","+"'POPUP'"+')">'+data.arr_word[i].word+' ('+data.arr_word[i].word_count+')</p>';
 		}
 	}else{
+		console.log('render content')
+		let start = new Date();
 		var partial=parseInt(data.arr_word.length / 2);	
+//		console.log(partial);
 		for(var i=0; i<partial; i++){
-			tcol1+='<p onclick="getWord('+"'"+data.arr_word[i].word+"'"+","+"'POPUP'"+')">'+data.arr_word[i].word+' ('+data.arr_word[i].word_count+')</p>';
+			document.getElementById('col1').innerHTML+='<p onclick="getWord('+"'"+data.arr_word[i].word+"'"+","+"'POPUP'"+')">'+data.arr_word[i].word+' ('+data.arr_word[i].word_count+')</p>';
 		}
 		for(var i=partial; i<data.arr_word.length; i++){
-			tcol2+='<p onclick="getWord('+"'"+data.arr_word[i].word+"'"+","+"'POPUP'"+')">'+data.arr_word[i].word+' ('+data.arr_word[i].word_count+')</p>';
+			document.getElementById('col2').innerHTML+='<p onclick="getWord('+"'"+data.arr_word[i].word+"'"+","+"'POPUP'"+')">'+data.arr_word[i].word+' ('+data.arr_word[i].word_count+')</p>';
 		}
-	}
-	document.getElementById('col1').innerHTML=tcol1;
-	document.getElementById('col2').innerHTML=tcol2;	
+		let end =new Date();
+		let time = Math.abs(end - start) / 1000;
+		let minutes = Math.floor(time / 60) % 60;
+		let sec = time % 60;
+		console.log('success render '+minutes+':'+sec)
+	}	
 	if(type=='load'){
 		document.getElementById('getView').click();
 	}
+	
 }
 
 function sortTable(n,id) {
